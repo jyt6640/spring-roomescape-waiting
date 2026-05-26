@@ -56,7 +56,7 @@ class WaitingJdbcTemplateRepositoryTest {
     @DisplayName("대기를 저장하면 생성된 ID를 포함한 대기 객체를 반환한다")
     void save_success() {
         // given
-        Waiting waiting = Waiting.create("브라운", DATE, savedTime, savedTheme, 1);
+        Waiting waiting = Waiting.create(1L, "브라운", DATE, savedTime, savedTheme, 1);
 
         // when
         Waiting savedWaiting = waitingRepository.save(waiting);
@@ -71,8 +71,8 @@ class WaitingJdbcTemplateRepositoryTest {
     @DisplayName("같은 슬롯에 등록된 대기 수를 조회한다")
     void countByDateAndTimeIdAndThemeId_success() {
         // given
-        waitingRepository.save(Waiting.create("브라운", DATE, savedTime, savedTheme, 1));
-        waitingRepository.save(Waiting.create("리오", DATE, savedTime, savedTheme, 2));
+        waitingRepository.save(Waiting.create(1L, "브라운", DATE, savedTime, savedTheme, 1));
+        waitingRepository.save(Waiting.create(1L, "리오", DATE, savedTime, savedTheme, 2));
 
         // when
         int count = waitingRepository.countByDateAndTimeIdAndThemeId(
@@ -89,9 +89,9 @@ class WaitingJdbcTemplateRepositoryTest {
     @DisplayName("이름을 기반으로 대기 목록과 현재 순번을 조회한다")
     void findByName_success_with_current_sequence() {
         // given
-        Waiting first = waitingRepository.save(Waiting.create("브라운", DATE, savedTime, savedTheme, 1));
-        Waiting second = waitingRepository.save(Waiting.create("리오", DATE, savedTime, savedTheme, 2));
-        Waiting third = waitingRepository.save(Waiting.create("포비", DATE, savedTime, savedTheme, 3));
+        Waiting first = waitingRepository.save(Waiting.create(1L, "브라운", DATE, savedTime, savedTheme, 1));
+        Waiting second = waitingRepository.save(Waiting.create(1L, "리오", DATE, savedTime, savedTheme, 2));
+        Waiting third = waitingRepository.save(Waiting.create(1L, "포비", DATE, savedTime, savedTheme, 3));
         waitingRepository.deleteByIdAndName(first.getId(), "브라운");
 
         // when
@@ -108,7 +108,7 @@ class WaitingJdbcTemplateRepositoryTest {
     @DisplayName("date, timeId, themeId, name이 모두 일치하는 대기를 조회한다")
     void findByDateAndTimeIdAndThemeIdAndName_success() {
         // given
-        Waiting savedWaiting = waitingRepository.save(Waiting.create("브라운", DATE, savedTime, savedTheme, 1));
+        Waiting savedWaiting = waitingRepository.save(Waiting.create(1L, "브라운", DATE, savedTime, savedTheme, 1));
 
         // when
         Optional<Waiting> result = waitingRepository.findByDateAndTimeIdAndThemeIdAndName(
@@ -126,7 +126,7 @@ class WaitingJdbcTemplateRepositoryTest {
     @DisplayName("이름과 대기 ID를 기반으로 자신의 대기를 삭제한다")
     void deleteByIdAndName_success() {
         // given
-        Waiting savedWaiting = waitingRepository.save(Waiting.create("브라운", DATE, savedTime, savedTheme, 1));
+        Waiting savedWaiting = waitingRepository.save(Waiting.create(1L, "브라운", DATE, savedTime, savedTheme, 1));
 
         // when
         waitingRepository.deleteByIdAndName(savedWaiting.getId(), "브라운");

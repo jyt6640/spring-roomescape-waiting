@@ -44,6 +44,7 @@ public class WaitingService {
                 createCommand.themeId()
         ) + 1;
         Waiting waiting = Waiting.create(
+                null,
                 createCommand.name(),
                 createCommand.date(),
                 time,

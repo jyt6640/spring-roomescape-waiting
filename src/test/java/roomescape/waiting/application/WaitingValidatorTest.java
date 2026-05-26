@@ -69,7 +69,7 @@ class WaitingValidatorTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now().plusDays(1);
-        waitingRepository.save(Waiting.create("리오", date, time, theme, 1));
+        waitingRepository.save(Waiting.create(1L, "리오", date, time, theme, 1));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, time.getId(), theme.getId());
 
         // when & then

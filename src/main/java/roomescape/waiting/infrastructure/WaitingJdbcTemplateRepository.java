@@ -81,6 +81,7 @@ public class WaitingJdbcTemplateRepository implements WaitingRepository {
 
         return Waiting.createRow(
                 rs.getLong("id"),
+                null,
                 rs.getString("waiting_name"),
                 rs.getDate("date").toLocalDate(),
                 time,

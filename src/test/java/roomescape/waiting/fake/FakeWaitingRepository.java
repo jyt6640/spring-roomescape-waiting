@@ -19,6 +19,7 @@ public class FakeWaitingRepository implements WaitingRepository {
         if (waiting.getId() == null) {
             Waiting saved = Waiting.createRow(
                     sequence++,
+                    waiting.getReservationId(),
                     waiting.getName(),
                     waiting.getDate(),
                     waiting.getTime(),

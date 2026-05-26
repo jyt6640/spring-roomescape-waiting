@@ -78,7 +78,7 @@ class WaitingServiceTest {
         Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "설명", "https://good.com"));
         LocalDate date = LocalDate.now();
         reservationRepository.save(Reservation.create("브라운", date, savedTime, savedTheme));
-        waitingRepository.save(Waiting.create("리오", date, savedTime, savedTheme, 1));
+        waitingRepository.save(Waiting.create(1L, "리오", date, savedTime, savedTheme, 1));
         WaitingCreateCommand command = new WaitingCreateCommand("포비", date, savedTime.getId(), savedTheme.getId());
 
         // when
@@ -113,7 +113,7 @@ class WaitingServiceTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         Waiting savedWaiting = waitingRepository.save(
-                Waiting.create("리오", LocalDate.now().plusDays(1), time, theme, 1)
+                Waiting.create(1L, "리오", LocalDate.now().plusDays(1), time, theme, 1)
         );
 
         // when
@@ -130,7 +130,7 @@ class WaitingServiceTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         Waiting savedWaiting = waitingRepository.save(
-                Waiting.create("리오", LocalDate.now().plusDays(1), time, theme, 1)
+                Waiting.create(1L, "리오", LocalDate.now().plusDays(1), time, theme, 1)
         );
 
         // when
