@@ -21,7 +21,6 @@ import roomescape.waiting.domain.WaitingRepository;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingValidator waitingValidator;
@@ -34,7 +33,6 @@ public class WaitingService {
             WaitingValidator waitingValidator
     ) {
         this.waitingRepository = waitingRepository;
-        this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingValidator = waitingValidator;
