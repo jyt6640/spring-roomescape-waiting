@@ -77,7 +77,8 @@ createServer(async (request, response) => {
     if (
       request.url?.startsWith('/times') ||
       request.url?.startsWith('/themes') ||
-      request.url?.startsWith('/reservations')
+      request.url?.startsWith('/reservations') ||
+      request.url?.startsWith('/waitings')
     ) {
       await proxy(request, response);
       return;
