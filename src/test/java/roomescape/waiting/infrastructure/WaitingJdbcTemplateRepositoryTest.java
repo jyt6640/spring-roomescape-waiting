@@ -77,6 +77,24 @@ class WaitingJdbcTemplateRepositoryTest {
     }
 
     @Test
+    @DisplayName("같은 슬롯에 등록된 대기 수를 조회한다")
+    void countByDateAndTimeIdAndThemeId_success() {
+        // given
+        waitingRepository.save(Waiting.create(savedReservation.getId(), "브라운", DATE, savedTime, savedTheme, 1));
+        waitingRepository.save(Waiting.create(savedReservation.getId(), "리오", DATE, savedTime, savedTheme, 2));
+
+        // when
+        int count = waitingRepository.countByDateAndTimeIdAndThemeId(
+                DATE,
+                savedTime.getId(),
+                savedTheme.getId()
+        );
+
+        // then
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("같은 예약에 등록된 대기 수를 조회한다")
     void countByReservationId_success() {
         // given
@@ -107,6 +125,26 @@ class WaitingJdbcTemplateRepositoryTest {
         assertThat(waitings.get(0).getId()).isEqualTo(second.getId());
         assertThat(waitings.get(0).getSequence()).isEqualTo(1);
         assertThat(waitingRepository.findById(third.getId()).orElseThrow().getSequence()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("date, timeId, themeId, name이 모두 일치하는 대기를 조회한다")
+    void findByDateAndTimeIdAndThemeIdAndName_success() {
+        // given
+        Waiting savedWaiting = waitingRepository.save(
+                Waiting.create(savedReservation.getId(), "브라운", DATE, savedTime, savedTheme, 1)
+        );
+
+        // when
+        Optional<Waiting> result = waitingRepository.findByDateAndTimeIdAndThemeIdAndName(
+                DATE,
+                savedTime.getId(),
+                savedTheme.getId(),
+                "브라운"
+        );
+
+        // then
+        assertThat(result).contains(savedWaiting);
     }
 
     @Test
