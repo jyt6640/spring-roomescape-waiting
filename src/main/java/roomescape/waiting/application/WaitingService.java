@@ -43,7 +43,6 @@ public class WaitingService {
                 reservedSlot.theme().getId()
         ) + 1;
         Waiting waiting = Waiting.create(
-                reservedSlot.reservationId(),
                 createCommand.name(),
                 reservedSlot.date(),
                 reservedSlot.time(),

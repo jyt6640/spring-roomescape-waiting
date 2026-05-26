@@ -42,7 +42,6 @@ class WaitingReservationReferenceAdapterTest {
         WaitingReservedSlot reservedSlot = referenceAdapter.getReservedSlot(command);
 
         // then
-        assertThat(reservedSlot.reservationId()).isEqualTo(reservation.getId());
         assertThat(reservedSlot.date()).isEqualTo(date);
         assertThat(reservedSlot.time()).isEqualTo(time);
         assertThat(reservedSlot.theme()).isEqualTo(theme);

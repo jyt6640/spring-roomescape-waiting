@@ -11,7 +11,6 @@ import roomescape.theme.domain.Theme;
 public class Waiting {
 
     private final Long id;
-    private final Long reservationId;
     private final String name;
     private final LocalDate date;
     private final ReservationTime time;
@@ -20,7 +19,6 @@ public class Waiting {
 
     private Waiting(
             Long id,
-            Long reservationId,
             String name,
             LocalDate date,
             ReservationTime time,
@@ -28,7 +26,6 @@ public class Waiting {
             int sequence
     ) {
         this.id = id;
-        this.reservationId = reservationId;
         this.name = name;
         this.date = date;
         this.time = time;
@@ -37,7 +34,6 @@ public class Waiting {
     }
 
     public static Waiting create(
-            Long reservationId,
             String name,
             LocalDate date,
             ReservationTime time,
@@ -45,23 +41,22 @@ public class Waiting {
             int sequence
     ) {
         validateCreatableDateTime(date, time);
-        return new Waiting(null, reservationId, name, date, time, theme, sequence);
+        return new Waiting(null, name, date, time, theme, sequence);
     }
 
     public static Waiting createRow(
             Long id,
-            Long reservationId,
             String name,
             LocalDate date,
             ReservationTime time,
             Theme theme,
             int sequence
     ) {
-        return new Waiting(id, reservationId, name, date, time, theme, sequence);
+        return new Waiting(id, name, date, time, theme, sequence);
     }
 
     public Waiting appendId(Long id) {
-        return new Waiting(id, reservationId, name, date, time, theme, sequence);
+        return new Waiting(id, name, date, time, theme, sequence);
     }
 
     public void cancel(String name) {
@@ -71,10 +66,6 @@ public class Waiting {
 
     public Long getId() {
         return id;
-    }
-
-    public Long getReservationId() {
-        return reservationId;
     }
 
     public String getName() {

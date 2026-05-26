@@ -27,7 +27,6 @@ public class WaitingReservationReferenceAdapter implements WaitingReservationRef
         ).orElseThrow(() -> new BusinessException(WaitingErrorCode.WAITING_RESERVED_SLOT_REQUIRED));
 
         return new WaitingReservedSlot(
-                reservation.getId(),
                 reservation.getDate(),
                 reservation.getTime(),
                 reservation.getTheme()

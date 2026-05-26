@@ -80,7 +80,7 @@ class ReservationControllerTest {
                                   Long themeId, String themeName, int sequence) {
         ReservationTime time = ReservationTime.createRow(timeId, LocalTime.parse(startAt));
         Theme theme = Theme.createRow(themeId, themeName, "설명", "https://thumbnail.com");
-        return Waiting.createRow(id, id, name, date, time, theme, sequence);
+        return Waiting.createRow(id, name, date, time, theme, sequence);
     }
 
     @Test

@@ -43,7 +43,7 @@ class WaitingServiceTest {
         ReservationTime savedTime = ReservationTime.createRow(1L, LocalTime.now().plusHours(1));
         Theme savedTheme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now();
-        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(1L, date, savedTime, savedTheme));
+        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(date, savedTime, savedTheme));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, savedTime.getId(), savedTheme.getId());
 
         // when
@@ -51,7 +51,6 @@ class WaitingServiceTest {
 
         // then
         assertThat(waiting.getId()).isNotNull();
-        assertThat(waiting.getReservationId()).isEqualTo(1L);
         assertThat(waiting.getName()).isEqualTo("리오");
         assertThat(waiting.getSequence()).isEqualTo(1);
         assertThat(waitingRepository.findById(waiting.getId())).contains(waiting);
@@ -64,8 +63,8 @@ class WaitingServiceTest {
         ReservationTime savedTime = ReservationTime.createRow(1L, LocalTime.now().plusHours(1));
         Theme savedTheme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now();
-        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(1L, date, savedTime, savedTheme));
-        waitingRepository.save(Waiting.create(1L, "리오", date, savedTime, savedTheme, 1));
+        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(date, savedTime, savedTheme));
+        waitingRepository.save(Waiting.create("리오", date, savedTime, savedTheme, 1));
         WaitingCreateCommand command = new WaitingCreateCommand("포비", date, savedTime.getId(), savedTheme.getId());
 
         // when
@@ -100,7 +99,7 @@ class WaitingServiceTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         Waiting savedWaiting = waitingRepository.save(
-                Waiting.create(1L, "리오", LocalDate.now().plusDays(1), time, theme, 1)
+                Waiting.create("리오", LocalDate.now().plusDays(1), time, theme, 1)
         );
 
         // when
@@ -117,7 +116,7 @@ class WaitingServiceTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         Waiting savedWaiting = waitingRepository.save(
-                Waiting.create(1L, "리오", LocalDate.now().plusDays(1), time, theme, 1)
+                Waiting.create("리오", LocalDate.now().plusDays(1), time, theme, 1)
         );
 
         // when

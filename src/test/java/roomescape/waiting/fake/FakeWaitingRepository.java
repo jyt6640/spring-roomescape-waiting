@@ -19,7 +19,6 @@ public class FakeWaitingRepository implements WaitingRepository {
         if (waiting.getId() == null) {
             Waiting saved = Waiting.createRow(
                     sequence++,
-                    waiting.getReservationId(),
                     waiting.getName(),
                     waiting.getDate(),
                     waiting.getTime(),
@@ -40,14 +39,6 @@ public class FakeWaitingRepository implements WaitingRepository {
     }
 
     @Override
-    public Optional<Waiting> findByReservationIdAndName(Long reservationId, String name) {
-        return store.values().stream()
-                .filter(waiting -> waiting.getReservationId().equals(reservationId))
-                .filter(waiting -> waiting.getName().equals(name))
-                .findFirst();
-    }
-
-    @Override
     public Optional<Waiting> findByDateAndTimeIdAndThemeIdAndName(
             LocalDate date,
             Long timeId,
@@ -60,13 +51,6 @@ public class FakeWaitingRepository implements WaitingRepository {
                 .filter(waiting -> waiting.getTheme().getId().equals(themeId))
                 .filter(waiting -> waiting.getName().equals(name))
                 .findFirst();
-    }
-
-    @Override
-    public int countByReservationId(Long reservationId) {
-        return (int) store.values().stream()
-                .filter(waiting -> waiting.getReservationId().equals(reservationId))
-                .count();
     }
 
     @Override

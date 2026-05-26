@@ -49,7 +49,7 @@ class WaitingControllerTest {
         LocalDate date = LocalDate.of(2026, 5, 5);
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "테마A", "설명", "https://thumbnail.com");
-        Waiting waiting = Waiting.createRow(1L, 1L, "브라운", date, time, theme, 2);
+        Waiting waiting = Waiting.createRow(1L, "브라운", date, time, theme, 2);
         WaitingCreateCommand command = new WaitingCreateCommand("브라운", date, 1L, 1L);
         given(waitingService.saveWaiting(command)).willReturn(waiting);
 

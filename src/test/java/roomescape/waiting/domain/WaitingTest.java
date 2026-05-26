@@ -22,10 +22,9 @@ class WaitingTest {
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
 
         // when
-        Waiting waiting = Waiting.create(1L, "브라운", LocalDate.now().plusDays(1), time, theme, 1);
+        Waiting waiting = Waiting.create("브라운", LocalDate.now().plusDays(1), time, theme, 1);
 
         // then
-        assertThat(waiting.getReservationId()).isEqualTo(1L);
         assertThat(waiting.getName()).isEqualTo("브라운");
         assertThat(waiting.getDate()).isEqualTo(LocalDate.now().plusDays(1));
         assertThat(waiting.getTime()).isEqualTo(time);
@@ -41,7 +40,7 @@ class WaitingTest {
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
 
         // when & then
-        assertThatThrownBy(() -> Waiting.create(1L, "브라운", LocalDate.now().minusDays(1), time, theme, 1))
+        assertThatThrownBy(() -> Waiting.create("브라운", LocalDate.now().minusDays(1), time, theme, 1))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("지난 일정으로 대기를 신청할 수 없습니다.");
     }
@@ -52,7 +51,7 @@ class WaitingTest {
         // given
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
-        Waiting waiting = Waiting.createRow(1L, 1L, "브라운", LocalDate.now().plusDays(1), time, theme, 1);
+        Waiting waiting = Waiting.createRow(1L, "브라운", LocalDate.now().plusDays(1), time, theme, 1);
 
         // when & then
         assertThatCode(() -> waiting.cancel("브라운"))
@@ -65,7 +64,7 @@ class WaitingTest {
         // given
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
-        Waiting waiting = Waiting.createRow(1L, 1L, "브라운", LocalDate.now().plusDays(1), time, theme, 1);
+        Waiting waiting = Waiting.createRow(1L, "브라운", LocalDate.now().plusDays(1), time, theme, 1);
 
         // when & then
         assertThatThrownBy(() -> waiting.cancel("리오"))
