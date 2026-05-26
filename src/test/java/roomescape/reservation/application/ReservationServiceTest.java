@@ -15,30 +15,28 @@ import roomescape.reservation.application.dto.ReservationCreateCommand;
 import roomescape.reservation.application.dto.ReservationUpdateCommand;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.fake.FakeReservationThemeReference;
+import roomescape.reservation.fake.FakeReservationTimeLookupReference;
 import roomescape.reservation.fake.FakeReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.reservationTime.domain.ReservationTimeRepository;
-import roomescape.reservationTime.fake.FakeReservationTimeRepository;
 import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeRepository;
-import roomescape.theme.fake.FakeThemeRepository;
 
 class ReservationServiceTest {
 
     private ReservationRepository reservationRepository;
-    private ReservationTimeRepository reservationTimeRepository;
-    private ThemeRepository themeRepository;
+    private FakeReservationTimeLookupReference reservationTimeReference;
+    private FakeReservationThemeReference themeReference;
     private ReservationService reservationService;
 
     @BeforeEach
     void setUp() {
         reservationRepository = new FakeReservationRepository();
-        reservationTimeRepository = new FakeReservationTimeRepository();
-        themeRepository = new FakeThemeRepository();
+        reservationTimeReference = new FakeReservationTimeLookupReference();
+        themeReference = new FakeReservationThemeReference();
         reservationService = new ReservationService(
                 reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
+                reservationTimeReference,
+                themeReference,
                 new ReservationValidator(reservationRepository)
         );
     }
@@ -47,8 +45,10 @@ class ReservationServiceTest {
     @DisplayName("예약을 저장한다")
     void saveReservation_success() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         ReservationCreateCommand command = new ReservationCreateCommand(
                 "흑곰",
                 LocalDate.now(),
@@ -73,7 +73,7 @@ class ReservationServiceTest {
     void saveReservation_fail_with_not_found_time() {
         // given
         Long notExistTimeId = 999L;
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
 
         ReservationCreateCommand command = new ReservationCreateCommand(
                 "흑곰",
@@ -95,7 +95,9 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 테마 ID로 예약하면 잘못된 요청 예외가 전파된다")
     void saveReservation_fail_with_not_found_theme() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
         Long notExistThemeId = 999L;
 
         ReservationCreateCommand command = new ReservationCreateCommand(
@@ -118,8 +120,10 @@ class ReservationServiceTest {
     @DisplayName("예약 목록을 조회한다")
     void getReservations_success() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         Reservation savedReservation = reservationRepository.save(Reservation.create(
                 "인직",
                 LocalDate.now(),
@@ -139,8 +143,10 @@ class ReservationServiceTest {
     void getReservations_success_with_date_and_theme() {
         // given
         LocalDate date = LocalDate.now();
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         Reservation savedReservation = reservationRepository.save(Reservation.create(
                 "인직",
                 date,
@@ -159,8 +165,10 @@ class ReservationServiceTest {
     @DisplayName("예약을 삭제한다")
     void deleteReservation_success() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         Reservation savedReservation = reservationRepository.save(Reservation.create(
                 "인직",
                 LocalDate.now(),
@@ -188,8 +196,10 @@ class ReservationServiceTest {
     @DisplayName("이름을 기반으로 자신의 예약 목록을 조회한다")
     void getReservationsByName_success() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         Reservation savedReservation = reservationRepository.save(Reservation.create(
                 "인직",
                 LocalDate.now(),
@@ -208,16 +218,16 @@ class ReservationServiceTest {
     @DisplayName("자신의 예약 날짜와 시간을 수정한다")
     void updateReservationSchedule_success() {
         // given
-        ReservationTime savedTime1 = reservationTimeRepository.save(
-                ReservationTime.create(LocalTime.now().plusHours(1))
+        ReservationTime savedTime1 = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
         );
 
-        ReservationTime savedTime2 = reservationTimeRepository.save(
-                ReservationTime.create(LocalTime.now().plusHours(2))
+        ReservationTime savedTime2 = reservationTimeReference.save(
+                ReservationTime.createRow(2L, LocalTime.now().plusHours(2))
         );
 
-        Theme savedTheme = themeRepository.save(
-                Theme.create("공포", "아니", "https://good.com/thumb-nail/1")
+        Theme savedTheme = themeReference.save(
+                Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1")
         );
 
         Reservation savedReservation = reservationRepository.save(
@@ -251,8 +261,8 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 예약 ID로 수정하면 예외가 발생한다")
     void updateReservationSchedule_fail_with_not_found_reservation() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(
-                ReservationTime.create(LocalTime.now().plusHours(1))
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
         );
 
         // when & then
@@ -270,12 +280,12 @@ class ReservationServiceTest {
     @DisplayName("본인의 예약이 아니면 수정 시 예외가 발생한다")
     void updateReservationSchedule_fail_with_invalid_owner() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(
-                ReservationTime.create(LocalTime.now().plusHours(1))
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
         );
 
-        Theme savedTheme = themeRepository.save(
-                Theme.create("공포", "설명", "https://good.com")
+        Theme savedTheme = themeReference.save(
+                Theme.createRow(1L, "공포", "설명", "https://good.com")
         );
 
         Reservation savedReservation = reservationRepository.save(
@@ -302,8 +312,10 @@ class ReservationServiceTest {
     @DisplayName("이름을 기반으로 자신의 예약을 취소한다")
     void cancelReservation_success() {
         // given
-        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.create(LocalTime.now().plusHours(1)));
-        Theme savedTheme = themeRepository.save(Theme.create("공포", "아니", "https://good.com/thumb-nail/1"));
+        ReservationTime savedTime = reservationTimeReference.save(
+                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
+        );
+        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "아니", "https://good.com/thumb-nail/1"));
         Reservation savedReservation = reservationRepository.save(Reservation.create(
                 "인직",
                 LocalDate.now(),

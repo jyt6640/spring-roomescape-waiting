@@ -5,44 +5,39 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ReservationErrorCode;
-import roomescape.global.exception.customException.BusinessException;
 import roomescape.global.exception.customException.EntityNotFoundException;
 import roomescape.reservation.application.dto.ReservationCreateCommand;
 import roomescape.reservation.application.dto.ReservationUpdateCommand;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeRepository;
 
 @Service
 @Transactional(readOnly = true)
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final ReservationTimeRepository reservationTimeRepository;
-    private final ThemeRepository themeRepository;
+    private final ReservationTimeLookupReference reservationTimeReference;
+    private final ReservationThemeReference themeReference;
     private final ReservationValidator reservationValidator;
 
     public ReservationService(
             ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
+            ReservationTimeLookupReference reservationTimeReference,
+            ReservationThemeReference themeReference,
             ReservationValidator reservationValidator
     ) {
         this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
+        this.reservationTimeReference = reservationTimeReference;
+        this.themeReference = themeReference;
         this.reservationValidator = reservationValidator;
     }
 
     @Transactional
     public Reservation saveReservation(ReservationCreateCommand createCommand) {
-        ReservationTime time = reservationTimeRepository.findById(createCommand.timeId())
-                .orElseThrow(() -> new BusinessException(ReservationErrorCode.RESERVATION_TIME_INVALID));
-        Theme theme = themeRepository.findById(createCommand.themeId())
-                .orElseThrow(() -> new BusinessException(ReservationErrorCode.RESERVATION_THEME_INVALID));
+        ReservationTime time = reservationTimeReference.getReservationTime(createCommand.timeId());
+        Theme theme = themeReference.getTheme(createCommand.themeId());
 
         reservationValidator.validateAlreadyReservation(createCommand);
         Reservation reservation = Reservation.create(
@@ -68,8 +63,7 @@ public class ReservationService {
 
     @Transactional
     public void updateReservationSchedule(ReservationUpdateCommand updateCommand) {
-        ReservationTime time = reservationTimeRepository.findById(updateCommand.timeId())
-                .orElseThrow(() -> new BusinessException(ReservationErrorCode.RESERVATION_TIME_INVALID));
+        ReservationTime time = reservationTimeReference.getReservationTime(updateCommand.timeId());
         Reservation targetReservation = reservationRepository.findById(updateCommand.id())
                 .orElseThrow(() -> new EntityNotFoundException(ReservationErrorCode.RESERVATION_NOT_FOUND, updateCommand.id()));
 
