@@ -21,15 +21,20 @@ import roomescape.reservation.application.dto.ReservationUpdateCommand;
 import roomescape.reservation.presentation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.presentation.dto.request.ReservationUpdateRequest;
 import roomescape.reservation.presentation.dto.response.ReservationResponse;
+import roomescape.reservation.presentation.dto.response.UserReservationResponse;
+import roomescape.waiting.application.WaitingService;
+import roomescape.waiting.domain.Waiting;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService service;
+    private final WaitingService waitingService;
 
-    public ReservationController(ReservationService service) {
+    public ReservationController(ReservationService service, WaitingService waitingService) {
         this.service = service;
+        this.waitingService = waitingService;
     }
 
     @PostMapping
@@ -58,10 +63,10 @@ public class ReservationController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<ReservationResponse>> getUserReservations(
+    public ResponseEntity<List<UserReservationResponse>> getUserReservations(
             @RequestParam String name
     ) {
-        List<ReservationResponse> response = findUserReservations(name);
+        List<UserReservationResponse> response = findUserReservations(name);
         return ResponseEntity.ok(response);
     }
 
@@ -109,9 +114,14 @@ public class ReservationController {
                 .toList();
     }
 
-    private List<ReservationResponse> findUserReservations(String name) {
-        return service.getReservationsByName(name).stream()
-                .map(ReservationResponse::from)
+    private List<UserReservationResponse> findUserReservations(String name) {
+        List<UserReservationResponse> reservations = service.getReservationsByName(name).stream()
+                .map(UserReservationResponse::fromReservation)
+                .toList();
+        List<UserReservationResponse> waitings = waitingService.getWaitingsByName(name).stream()
+                .map(UserReservationResponse::fromWaiting)
+                .toList();
+        return java.util.stream.Stream.concat(reservations.stream(), waitings.stream())
                 .toList();
     }
 }
