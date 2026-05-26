@@ -4,5 +4,5 @@ import roomescape.waiting.application.dto.WaitingCreateCommand;
 
 public interface WaitingReservationReference {
 
-    void validateReservedSlot(WaitingCreateCommand createCommand);
+    WaitingReservedSlot getReservedSlot(WaitingCreateCommand createCommand);
 }

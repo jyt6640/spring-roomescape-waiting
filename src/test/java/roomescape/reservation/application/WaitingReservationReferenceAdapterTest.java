@@ -1,6 +1,6 @@
 package roomescape.reservation.application;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
@@ -14,6 +14,7 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.fake.FakeReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
+import roomescape.waiting.application.WaitingReservedSlot;
 import roomescape.waiting.application.dto.WaitingCreateCommand;
 
 class WaitingReservationReferenceAdapterTest {
@@ -28,23 +29,28 @@ class WaitingReservationReferenceAdapterTest {
     }
 
     @Test
-    @DisplayName("예약된 슬롯이면 예외가 발생하지 않는다")
-    void validateReservedSlot_success() {
+    @DisplayName("예약된 슬롯을 조회한다")
+    void getReservedSlot_success() {
         // given
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now().plusDays(1);
-        reservationRepository.save(Reservation.create("브라운", date, time, theme));
+        Reservation reservation = reservationRepository.save(Reservation.create("브라운", date, time, theme));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, time.getId(), theme.getId());
 
-        // when & then
-        assertThatCode(() -> referenceAdapter.validateReservedSlot(command))
-                .doesNotThrowAnyException();
+        // when
+        WaitingReservedSlot reservedSlot = referenceAdapter.getReservedSlot(command);
+
+        // then
+        assertThat(reservedSlot.reservationId()).isEqualTo(reservation.getId());
+        assertThat(reservedSlot.date()).isEqualTo(date);
+        assertThat(reservedSlot.time()).isEqualTo(time);
+        assertThat(reservedSlot.theme()).isEqualTo(theme);
     }
 
     @Test
     @DisplayName("예약되지 않은 슬롯이면 예외가 발생한다")
-    void validateReservedSlot_fail_with_not_reserved_slot() {
+    void getReservedSlot_fail_with_not_reserved_slot() {
         // given
         WaitingCreateCommand command = new WaitingCreateCommand(
                 "리오",
@@ -54,7 +60,7 @@ class WaitingReservationReferenceAdapterTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> referenceAdapter.validateReservedSlot(command))
+        assertThatThrownBy(() -> referenceAdapter.getReservedSlot(command))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("예약된 시간에만 대기를 신청할 수 있습니다.");
     }

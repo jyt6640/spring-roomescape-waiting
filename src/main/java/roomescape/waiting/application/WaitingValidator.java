@@ -23,7 +23,7 @@ public class WaitingValidator {
     }
 
     private void validateReservedSlot(WaitingCreateCommand createCommand) {
-        reservationReference.validateReservedSlot(createCommand);
+        reservationReference.getReservedSlot(createCommand);
     }
 
     private void validateDuplicateWaiting(WaitingCreateCommand createCommand) {
