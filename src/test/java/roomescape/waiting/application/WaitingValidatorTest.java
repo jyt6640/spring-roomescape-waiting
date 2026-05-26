@@ -9,27 +9,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.global.exception.customException.BusinessException;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.fake.FakeReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.waiting.application.dto.WaitingCreateCommand;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
+import roomescape.waiting.fake.FakeWaitingReservationReference;
 import roomescape.waiting.fake.FakeWaitingRepository;
 
 class WaitingValidatorTest {
 
     private WaitingRepository waitingRepository;
-    private ReservationRepository reservationRepository;
+    private FakeWaitingReservationReference reservationReference;
     private WaitingValidator waitingValidator;
 
     @BeforeEach
     void setUp() {
         waitingRepository = new FakeWaitingRepository();
-        reservationRepository = new FakeReservationRepository();
-        waitingValidator = new WaitingValidator(waitingRepository, reservationRepository);
+        reservationReference = new FakeWaitingReservationReference();
+        waitingValidator = new WaitingValidator(waitingRepository, reservationReference);
     }
 
     @Test
@@ -39,7 +37,6 @@ class WaitingValidatorTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now().plusDays(1);
-        reservationRepository.save(Reservation.create("브라운", date, time, theme));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, time.getId(), theme.getId());
 
         // when & then
@@ -57,6 +54,7 @@ class WaitingValidatorTest {
                 1L,
                 1L
         );
+        reservationReference.setReservedSlot(false);
 
         // when & then
         assertThatThrownBy(() -> waitingValidator.validateWaitingAvailable(command))
@@ -71,7 +69,6 @@ class WaitingValidatorTest {
         ReservationTime time = ReservationTime.createRow(1L, LocalTime.of(10, 0));
         Theme theme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now().plusDays(1);
-        reservationRepository.save(Reservation.create("브라운", date, time, theme));
         waitingRepository.save(Waiting.create("리오", date, time, theme, 1));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, time.getId(), theme.getId());
 

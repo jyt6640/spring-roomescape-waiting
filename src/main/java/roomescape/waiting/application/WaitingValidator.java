@@ -3,7 +3,6 @@ package roomescape.waiting.application;
 import org.springframework.stereotype.Component;
 import roomescape.global.exception.WaitingErrorCode;
 import roomescape.global.exception.customException.BusinessException;
-import roomescape.reservation.domain.ReservationRepository;
 import roomescape.waiting.application.dto.WaitingCreateCommand;
 import roomescape.waiting.domain.WaitingRepository;
 
@@ -11,11 +10,11 @@ import roomescape.waiting.domain.WaitingRepository;
 public class WaitingValidator {
 
     private final WaitingRepository waitingRepository;
-    private final ReservationRepository reservationRepository;
+    private final WaitingReservationReference reservationReference;
 
-    public WaitingValidator(WaitingRepository waitingRepository, ReservationRepository reservationRepository) {
+    public WaitingValidator(WaitingRepository waitingRepository, WaitingReservationReference reservationReference) {
         this.waitingRepository = waitingRepository;
-        this.reservationRepository = reservationRepository;
+        this.reservationReference = reservationReference;
     }
 
     public void validateWaitingAvailable(WaitingCreateCommand createCommand) {
@@ -24,14 +23,7 @@ public class WaitingValidator {
     }
 
     private void validateReservedSlot(WaitingCreateCommand createCommand) {
-        boolean reserved = reservationRepository.findByDateAndTimeIdAndThemeId(
-                createCommand.date(),
-                createCommand.timeId(),
-                createCommand.themeId()
-        ).isPresent();
-        if (!reserved) {
-            throw new BusinessException(WaitingErrorCode.WAITING_RESERVED_SLOT_REQUIRED);
-        }
+        reservationReference.validateReservedSlot(createCommand);
     }
 
     private void validateDuplicateWaiting(WaitingCreateCommand createCommand) {
