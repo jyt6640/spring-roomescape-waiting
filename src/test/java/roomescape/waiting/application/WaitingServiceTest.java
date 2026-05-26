@@ -11,38 +11,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.global.exception.customException.BusinessException;
 import roomescape.global.exception.customException.EntityNotFoundException;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.fake.FakeReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.waiting.application.dto.WaitingCreateCommand;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 import roomescape.waiting.fake.FakeWaitingReservationReference;
-import roomescape.waiting.fake.FakeWaitingReservationTimeReference;
 import roomescape.waiting.fake.FakeWaitingRepository;
-import roomescape.waiting.fake.FakeWaitingThemeReference;
 
 class WaitingServiceTest {
 
     private WaitingRepository waitingRepository;
-    private ReservationRepository reservationRepository;
-    private FakeWaitingReservationTimeReference reservationTimeReference;
-    private FakeWaitingThemeReference themeReference;
+    private FakeWaitingReservationReference reservationReference;
     private WaitingService waitingService;
 
     @BeforeEach
     void setUp() {
         waitingRepository = new FakeWaitingRepository();
-        reservationRepository = new FakeReservationRepository();
-        reservationTimeReference = new FakeWaitingReservationTimeReference();
-        themeReference = new FakeWaitingThemeReference();
+        reservationReference = new FakeWaitingReservationReference();
         waitingService = new WaitingService(
                 waitingRepository,
-                reservationTimeReference,
-                themeReference,
-                new WaitingValidator(waitingRepository, new FakeWaitingReservationReference())
+                reservationReference,
+                new WaitingValidator(waitingRepository)
         );
     }
 
@@ -50,12 +40,10 @@ class WaitingServiceTest {
     @DisplayName("예약된 슬롯에 대기를 저장한다")
     void saveWaiting_success() {
         // given
-        ReservationTime savedTime = reservationTimeReference.save(
-                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
-        );
-        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "설명", "https://good.com"));
+        ReservationTime savedTime = ReservationTime.createRow(1L, LocalTime.now().plusHours(1));
+        Theme savedTheme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now();
-        reservationRepository.save(Reservation.create("브라운", date, savedTime, savedTheme));
+        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(1L, date, savedTime, savedTheme));
         WaitingCreateCommand command = new WaitingCreateCommand("리오", date, savedTime.getId(), savedTheme.getId());
 
         // when
@@ -63,6 +51,7 @@ class WaitingServiceTest {
 
         // then
         assertThat(waiting.getId()).isNotNull();
+        assertThat(waiting.getReservationId()).isEqualTo(1L);
         assertThat(waiting.getName()).isEqualTo("리오");
         assertThat(waiting.getSequence()).isEqualTo(1);
         assertThat(waitingRepository.findById(waiting.getId())).contains(waiting);
@@ -72,12 +61,10 @@ class WaitingServiceTest {
     @DisplayName("같은 슬롯에 먼저 신청된 대기가 있으면 다음 순번으로 저장한다")
     void saveWaiting_success_with_next_sequence() {
         // given
-        ReservationTime savedTime = reservationTimeReference.save(
-                ReservationTime.createRow(1L, LocalTime.now().plusHours(1))
-        );
-        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "설명", "https://good.com"));
+        ReservationTime savedTime = ReservationTime.createRow(1L, LocalTime.now().plusHours(1));
+        Theme savedTheme = Theme.createRow(1L, "공포", "설명", "https://good.com");
         LocalDate date = LocalDate.now();
-        reservationRepository.save(Reservation.create("브라운", date, savedTime, savedTheme));
+        reservationReference.setWaitingReservedSlot(new WaitingReservedSlot(1L, date, savedTime, savedTheme));
         waitingRepository.save(Waiting.create(1L, "리오", date, savedTime, savedTheme, 1));
         WaitingCreateCommand command = new WaitingCreateCommand("포비", date, savedTime.getId(), savedTheme.getId());
 
@@ -89,21 +76,21 @@ class WaitingServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 예약 시간으로 대기하면 예외가 발생한다")
-    void saveWaiting_fail_with_not_found_time() {
+    @DisplayName("예약되지 않은 슬롯으로 대기하면 예외가 발생한다")
+    void saveWaiting_fail_with_not_reserved_slot() {
         // given
-        Theme savedTheme = themeReference.save(Theme.createRow(1L, "공포", "설명", "https://good.com"));
         WaitingCreateCommand command = new WaitingCreateCommand(
                 "리오",
                 LocalDate.now().plusDays(1),
-                999L,
-                savedTheme.getId()
+                1L,
+                1L
         );
+        reservationReference.setReservedSlot(false);
 
         // when & then
         assertThatThrownBy(() -> waitingService.saveWaiting(command))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("존재하지 않는 예약 시간입니다.");
+                .hasMessageContaining("예약된 시간에만 대기를 신청할 수 있습니다.");
     }
 
     @Test

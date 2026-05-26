@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.WaitingErrorCode;
 import roomescape.global.exception.customException.EntityNotFoundException;
-import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
 import roomescape.waiting.application.dto.WaitingCreateCommand;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
@@ -16,39 +14,31 @@ import roomescape.waiting.domain.WaitingRepository;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final WaitingReservationTimeReference reservationTimeReference;
-    private final WaitingThemeReference themeReference;
+    private final WaitingReservationReference reservationReference;
     private final WaitingValidator waitingValidator;
 
     public WaitingService(
             WaitingRepository waitingRepository,
-            WaitingReservationTimeReference reservationTimeReference,
-            WaitingThemeReference themeReference,
+            WaitingReservationReference reservationReference,
             WaitingValidator waitingValidator
     ) {
         this.waitingRepository = waitingRepository;
-        this.reservationTimeReference = reservationTimeReference;
-        this.themeReference = themeReference;
+        this.reservationReference = reservationReference;
         this.waitingValidator = waitingValidator;
     }
 
     @Transactional
     public Waiting saveWaiting(WaitingCreateCommand createCommand) {
-        ReservationTime time = reservationTimeReference.getReservationTime(createCommand.timeId());
-        Theme theme = themeReference.getTheme(createCommand.themeId());
+        WaitingReservedSlot reservedSlot = reservationReference.getReservedSlot(createCommand);
 
-        waitingValidator.validateWaitingAvailable(createCommand);
-        int sequence = waitingRepository.countByDateAndTimeIdAndThemeId(
-                createCommand.date(),
-                createCommand.timeId(),
-                createCommand.themeId()
-        ) + 1;
+        waitingValidator.validateDuplicateWaiting(reservedSlot.reservationId(), createCommand.name());
+        int sequence = waitingRepository.countByReservationId(reservedSlot.reservationId()) + 1;
         Waiting waiting = Waiting.create(
-                null,
+                reservedSlot.reservationId(),
                 createCommand.name(),
-                createCommand.date(),
-                time,
-                theme,
+                reservedSlot.date(),
+                reservedSlot.time(),
+                reservedSlot.theme(),
                 sequence
         );
         return waitingRepository.save(waiting);
