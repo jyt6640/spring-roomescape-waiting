@@ -1,6 +1,5 @@
 package roomescape.waiting.domain;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,15 +10,6 @@ public interface WaitingRepository {
     Optional<Waiting> findById(Long id);
 
     Optional<Waiting> findByReservationIdAndName(Long reservationId, String name);
-
-    Optional<Waiting> findByDateAndTimeIdAndThemeIdAndName(
-            LocalDate date,
-            Long timeId,
-            Long themeId,
-            String name
-    );
-
-    int countByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
     int countByReservationId(Long reservationId);
 
