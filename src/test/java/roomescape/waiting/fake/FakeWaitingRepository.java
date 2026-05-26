@@ -40,6 +40,14 @@ public class FakeWaitingRepository implements WaitingRepository {
     }
 
     @Override
+    public Optional<Waiting> findByReservationIdAndName(Long reservationId, String name) {
+        return store.values().stream()
+                .filter(waiting -> waiting.getReservationId().equals(reservationId))
+                .filter(waiting -> waiting.getName().equals(name))
+                .findFirst();
+    }
+
+    @Override
     public Optional<Waiting> findByDateAndTimeIdAndThemeIdAndName(
             LocalDate date,
             Long timeId,
@@ -60,6 +68,13 @@ public class FakeWaitingRepository implements WaitingRepository {
                 .filter(waiting -> waiting.getDate().equals(date))
                 .filter(waiting -> waiting.getTime().getId().equals(timeId))
                 .filter(waiting -> waiting.getTheme().getId().equals(themeId))
+                .count();
+    }
+
+    @Override
+    public int countByReservationId(Long reservationId) {
+        return (int) store.values().stream()
+                .filter(waiting -> waiting.getReservationId().equals(reservationId))
                 .count();
     }
 

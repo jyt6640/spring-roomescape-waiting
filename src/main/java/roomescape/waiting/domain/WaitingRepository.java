@@ -10,6 +10,8 @@ public interface WaitingRepository {
 
     Optional<Waiting> findById(Long id);
 
+    Optional<Waiting> findByReservationIdAndName(Long reservationId, String name);
+
     Optional<Waiting> findByDateAndTimeIdAndThemeIdAndName(
             LocalDate date,
             Long timeId,
@@ -18,6 +20,8 @@ public interface WaitingRepository {
     );
 
     int countByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+
+    int countByReservationId(Long reservationId);
 
     List<Waiting> findByName(String name);
 
