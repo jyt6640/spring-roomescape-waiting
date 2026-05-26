@@ -1,5 +1,6 @@
 package roomescape.waiting.application;
 
+import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 import roomescape.global.exception.WaitingErrorCode;
 import roomescape.global.exception.customException.BusinessException;
@@ -14,8 +15,8 @@ public class WaitingValidator {
         this.waitingRepository = waitingRepository;
     }
 
-    public void validateDuplicateWaiting(Long reservationId, String name) {
-        boolean exists = waitingRepository.findByReservationIdAndName(reservationId, name)
+    public void validateDuplicateWaiting(LocalDate date, Long timeId, Long themeId, String name) {
+        boolean exists = waitingRepository.findByDateAndTimeIdAndThemeIdAndName(date, timeId, themeId, name)
                 .isPresent();
         if (exists) {
             throw new BusinessException(WaitingErrorCode.WAITING_ALREADY_EXISTS);

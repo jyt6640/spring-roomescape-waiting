@@ -35,7 +35,7 @@ class WaitingValidatorTest {
         waitingRepository.save(Waiting.create(1L, "리오", date, time, theme, 1));
 
         // when & then
-        assertThatThrownBy(() -> waitingValidator.validateDuplicateWaiting(1L, "리오"))
+        assertThatThrownBy(() -> waitingValidator.validateDuplicateWaiting(date, time.getId(), theme.getId(), "리오"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("이미 대기를 신청한 시간입니다.");
     }

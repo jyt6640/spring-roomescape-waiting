@@ -31,8 +31,17 @@ public class WaitingService {
     public Waiting saveWaiting(WaitingCreateCommand createCommand) {
         WaitingReservedSlot reservedSlot = reservationReference.getReservedSlot(createCommand);
 
-        waitingValidator.validateDuplicateWaiting(reservedSlot.reservationId(), createCommand.name());
-        int sequence = waitingRepository.countByReservationId(reservedSlot.reservationId()) + 1;
+        waitingValidator.validateDuplicateWaiting(
+                reservedSlot.date(),
+                reservedSlot.time().getId(),
+                reservedSlot.theme().getId(),
+                createCommand.name()
+        );
+        int sequence = waitingRepository.countByDateAndTimeIdAndThemeId(
+                reservedSlot.date(),
+                reservedSlot.time().getId(),
+                reservedSlot.theme().getId()
+        ) + 1;
         Waiting waiting = Waiting.create(
                 reservedSlot.reservationId(),
                 createCommand.name(),
