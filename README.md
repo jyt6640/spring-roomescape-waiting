@@ -49,29 +49,36 @@
 
 ## 실행 방법
 
-### 백엔드
+### 프론트엔드 + 백엔드
 
 ```bash
 ./gradlew bootRun
 ```
 
 - 기본 주소: `http://localhost:8080`
+- 루트 주소(`http://localhost:8080/`)는 사용자 예약 페이지로 이동한다.
+- 사용자 예약 페이지: `http://localhost:8080/user/index.html`
+- 사용자 마이페이지: `http://localhost:8080/user/mypage.html`
+- 관리자 페이지: `http://localhost:8080/admin/index.html`
 - H2 Console: `http://localhost:8080/h2-console`
+- Gradle 빌드 시 `FE/`의 정적 파일이 Spring Boot 실행 파일에 함께 포함된다.
 
-### 프론트엔드
+배포 파일은 다음 명령으로 생성한다.
+
+```bash
+./gradlew bootJar
+java -jar build/libs/spring-roomescape-waiting-0.0.1-SNAPSHOT.jar
+```
+
+프론트엔드만 별도로 개발할 때는 기존 개발 서버를 사용할 수 있다.
 
 ```bash
 node FE/dev-server.mjs
 ```
 
 - 기본 주소: `http://localhost:3000`
-- 루트 주소(`http://localhost:3000/`)는 사용자 예약 페이지를 보여준다.
-- 사용자 예약 페이지: `http://localhost:3000/user/index.html`
-- 사용자 마이페이지: `http://localhost:3000/user/mypage.html`
-- 관리자 페이지: `http://localhost:3000/admin/index.html`
 - API 요청은 기본적으로 `http://localhost:8080`으로 프록시된다.
 - 다른 백엔드 주소를 사용하려면 `BE_ORIGIN=http://localhost:8081 node FE/dev-server.mjs`처럼 실행한다.
-- 정상 실행 시 터미널에 `FE server: http://localhost:3000` 로그가 출력된다.
 
 ---
 
